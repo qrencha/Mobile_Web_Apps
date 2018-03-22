@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+	<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<title>Dallas Open Data</title>
+	<script>
+
+	let choosen_score;
+	
+	let restaurant_url = 'https://www.dallasopendata.com/resource/44uy-sq8p.json?$where=score='+choosen_score;
+
+	function showPosition(){
+		choosen_score = document.getElementById("theScore").value;
+
+		let ddAPI = "https://www.dallasopendata.com/resource/44uy-sq8p.json?";
+		$.getJSON( ddAPI, {
+			score: choosen_score
+		}).done(function( data ) {
+			let establishments = Object.keys(data).length;
+			if (establishments != 0){
+				let lat = data[0].lat_long.coordinates[1];
+				let lon = data[0].lat_long.coordinates[0];
+				let name = data[0].program_identifier;
+				<!-- console.log('restaurant name is',name); -->
+				<!-- console.log('latitude is',lat,'and','longitude is',lon); -->
+				let latlon = lat+','+lon;
+				let img_url = "https://maps.googleapis.com/maps/api/staticmap?center="+latlon+"&zoom=14&size=400x300&key=AIzaSyBu-916DdpKAjTmJNIgngS6HL_kDIKU0aU";
+				document.getElementById("mapholder").innerHTML = "<img style='width:100%' class='img-rounded' src='"+img_url+"'>";
+				document.getElementById("pin").innerHTML = "<img src='glyphicons-243-map-marker.png'>";
+				document.getElementById("name").innerHTML = "<p><b>"+name+"</b> is one  establishment out of "+establishments+" in the current list with a score of <b>"+choosen_score+"</b></p>";
+				document.getElementById("reload").innerHTML = "<button onclick='reloadFun()'>Reload page</button>";
+				let vanishElement = document.getElementById("vanish");
+				vanishElement.parentNode.removeChild(vanishElement);
+			} else {
+				document.getElementById("name").innerHTML = "<p> There is no establishment with a score of <b>"+choosen_score+"<b></p>";
+				document.getElementById("reload").innerHTML = "<button onclick='reloadFun()'>Reload page</button>";
+				let vanishElement = document.getElementById("vanish");
+				vanishElement.parentNode.removeChild(vanishElement);
+			}
+		});
+
+	}
+	
+	function reloadFun() {
+		location.reload();
+	}
+
+	</script>
+	<style>
+	
+	body {
+		font-family: 'Lato', monospace;
+	
+	}
+	.container {
+		position: relative;
+		text-align: center;
+		color: black;
+	}
+	.centered{
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%,-50%);
+		color:blue;
+		font-weight:bold;
+	}
+	</style>
+	</head>
+	<body>
+	<div class='jumbotron'>
+		<div class="container text-center">
+		<h1>Dallas City Restaurant Inspection Scores</h1>
+		<div class="container text-center">
+		<div id='mapholder'></div>
+		<div id='pin' class='centered'></div>
+		</div>
+		<div id='name'>
+		</div>
+		<div id='vanish'>
+			<p>
+			Enter a Score (between 50 and 100): <input type="text" id="theScore">
+			</p>
+			<button type="button" class="btn" onclick="showPosition()">Click to see location</button>
+		</div>
+		<div id='reload'>
+		</div>
+		</div>
+		</div>
+	</body>
+	<footer class="container-fluid text-center">
+		<p>Rene Chandler Copyright</p>
+	</footer>
+</html>
